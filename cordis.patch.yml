@@ -1,0 +1,5 @@
+# The Skills pane bundle: one plugin row whose Host half folds the session log
+# into the `skillsPane` projection and whose Client half draws the right-side tab.
+- insert:
+    - id: skills-pane
+      name: 'dsh-skills-pane'

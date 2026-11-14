@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Skills pane",
+    "description": "A right-side Skills pane listing every skill loaded into this conversation, with its size, reload count, context positions, and turn. Skills a compaction dropped stay listed struck through. Open it from the right sidebar Start page or New tab."
+  }
+}

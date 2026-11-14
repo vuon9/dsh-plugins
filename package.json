@@ -1,0 +1,57 @@
+{
+  "name": "dsh-skills-pane",
+  "version": "1.0.0",
+  "description": "Right-side Skills pane for DeepSeek Harness: every skill loaded into this conversation, with its size, reload count, context positions, and turn; skills dropped by compaction are struck through.",
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "skills",
+    "sidebar"
+  ],
+  "license": "MIT",
+  "author": "Vuong (https://github.com/vuon9)",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vuon9/dsh-skills-pane.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vuon9/dsh-skills-pane/issues"
+  },
+  "homepage": "https://github.com/vuon9/dsh-skills-pane#readme",
+  "engines": {
+    "dsh": ">=0.2.2-rc.3 <0.3.0"
+  },
+  "scripts": {
+    "test": "node --test test/fold.test.mjs"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "locale/*.json",
+    "icon.svg"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-sidebar-right",
+        "@deepseek-ai/dsh-client-locale"
+      ]
+    }
+  }
+}
