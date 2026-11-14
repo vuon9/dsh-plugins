@@ -4,6 +4,8 @@ A right-side **Skills** tab for DeepSeek Harness. It lists every skill loaded in
 
 Part of the [dsh-plugins](https://github.com/vuon9/dsh-plugins) collection.
 
+<img width="400" height="683" alt="image" src="https://github.com/user-attachments/assets/29a71c4c-ab9f-4852-be08-bf899da90d6b" />
+
 Each row shows the skill name, its size in the context, its extra reloads, where its loaded copies sit in the context (as a percentage, oldest to newest), and the turn of the latest copy. A skill whose instructions a compaction removed stays listed, dimmed and struck through, so you can see what the model used to have. While another copy is still in the context, the row stays live and describes that copy.
 
 The bar above the rows maps the skill text onto the current context: each colored block is one live copy, placed where it starts and sized by its share. The percentage beside the bar is how much of the current context is skill text. Colors follow size: green under 2k tokens, amber from 2k to 6k, red from 6k.
