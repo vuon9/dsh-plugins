@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Git bar",
+    "description": "A quiet bar above the message composer that names the current Git branch. The button at its right edge expands a second line with the absolute path of the working directory the session is running in. It reads the checkout's own Git files, so it also works in a linked worktree, and it never writes to the session."
+  }
+}

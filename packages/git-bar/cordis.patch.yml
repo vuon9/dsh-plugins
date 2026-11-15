@@ -1,0 +1,5 @@
+# The Git bar bundle: one plugin row whose Host half answers the branch route
+# and whose Client half draws the strip above the composer.
+- insert:
+    - id: git-bar
+      name: 'dsh-git-bar'

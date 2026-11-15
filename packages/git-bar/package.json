@@ -1,0 +1,60 @@
+{
+  "name": "dsh-git-bar",
+  "version": "1.0.0",
+  "description": "A quiet bar above the message composer naming the current Git branch, with the working directory's absolute path one click away.",
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "git",
+    "branch",
+    "worktree"
+  ],
+  "license": "MIT",
+  "author": "Vuong (https://github.com/vuon9)",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vuon9/dsh-plugins.git",
+    "directory": "packages/git-bar"
+  },
+  "bugs": {
+    "url": "https://github.com/vuon9/dsh-plugins/issues"
+  },
+  "homepage": "https://github.com/vuon9/dsh-plugins/tree/main/packages/git-bar#readme",
+  "engines": {
+    "dsh": ">=0.2.2-rc.3 <0.3.0"
+  },
+  "scripts": {
+    "test": "node --test test/git.test.mjs"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "locale/*.json",
+    "icon.svg"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-session",
+        "@deepseek-ai/dsh-client-locale"
+      ]
+    }
+  }
+}

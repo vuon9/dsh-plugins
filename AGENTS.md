@@ -51,4 +51,5 @@ Install the new commit again. When the manager reports `already-installed`, remo
 
 | Package | Directory | Install target |
 | --- | --- | --- |
+| `dsh-git-bar` | `packages/git-bar` | `github:vuon9/dsh-plugins#path:/packages/git-bar` |
 | `dsh-skills-pane` | `packages/skills-pane` | `github:vuon9/dsh-plugins#path:/packages/skills-pane` |
