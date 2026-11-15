@@ -1,0 +1,8 @@
+<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Git bar">
+  <circle cx="12.5" cy="9.5" r="3" fill="#45527F"/>
+  <circle cx="12.5" cy="21.5" r="3" fill="#45527F"/>
+  <circle cx="23" cy="13.5" r="3" fill="#7E8FC7"/>
+  <path d="M12.5 12.5v6" stroke="#45527F" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M23 16.5c0 3-3.4 3.6-8 5" stroke="#45527F" stroke-width="2.2" stroke-linecap="round"/>
+  <rect x="9.5" y="27" width="17" height="3" rx="1.5" fill="#7E8FC7"/>
+</svg>
