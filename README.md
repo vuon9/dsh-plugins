@@ -4,7 +4,7 @@ Plugins for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness),
 
 | Plugin | What it does |
 | --- | --- |
-| [git-bar](packages/git-bar) | A bar above the message composer naming the current Git branch, with the working directory's absolute path one click away. |
+| [git-bar](packages/git-bar) | A slim line above the message composer showing the current Git branch and the working directory's absolute path side by side. |
 | [skills-pane](packages/skills-pane) | Right-side Skills tab listing every skill loaded into the conversation, with its size, reload count, context positions, and turn. Skills a compaction removed stay listed struck through. |
 
 ## Install

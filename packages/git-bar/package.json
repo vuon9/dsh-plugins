@@ -1,7 +1,7 @@
 {
   "name": "dsh-git-bar",
   "version": "1.0.0",
-  "description": "A quiet bar above the message composer naming the current Git branch, with the working directory's absolute path one click away.",
+  "description": "A slim line above the message composer showing the current Git branch and the working directory's absolute path side by side.",
   "keywords": [
     "deepseek-harness",
     "dsh",
