@@ -1,10 +1,10 @@
 # Git bar
 
-A slim line directly above the message composer in DeepSeek Harness. It always shows the branch of the directory the conversation is working in, and its **Path** button opens a second full-width line with that directory's absolute path.
+A slim line directly above the message composer in DeepSeek Harness. It shows, side by side, the branch of the directory the conversation is working in and that directory's absolute path — no button, nothing to open.
 
 Part of the [dsh-plugins](https://github.com/vuon9/dsh-plugins) collection.
 
-Closed, the line is one row of chrome: a branch mark, the branch name, and **Path** with a chevron. It has the composer's width, so an ordinary branch name fits without truncation; a name too long for the window ellipsizes, and its full text stays available as a hover title. Pressing **Path** opens the path line beneath the row, inside the same width; pressing it again closes it, and the line takes a quiet surface while it is open. A detached checkout reads `Detached at <commit>`, a directory outside a Git checkout reads `Not a Git checkout`, a checkout whose files cannot be read reads `Branch unreadable`, and a route that does not answer reads `Branch unavailable` — the line itself stays put in every case.
+The line is one row of chrome: a branch mark, the branch name, a separator, then the path in monospace. It has the composer's width, so the usual branch and path fit together without truncation; when the window is narrower, the path ellipsizes from the right and its full value stays available as a hover title. A detached checkout reads `Detached at <commit>`, a directory outside a Git checkout reads `Not a Git checkout`, a checkout whose files cannot be read reads `Branch unreadable`, and a route that does not answer reads `Branch unavailable` — the path stays visible in every case.
 
 ## Install
 
@@ -23,7 +23,9 @@ To update, install the repository again at the new commit. Installs from Git sho
 
 The line registers in `conversation.input.dock`, the full-width strip directly above the composer card, at order 19 — below the goal and worktree cards and above the queued-message strip, so it reads as the composer's own edge. It appears in every conversation and needs no setup.
 
-The placement is deliberate. A branch name is occasionally long and a path is always long, so both need horizontal room and a home that can grow a second line; the centered statistics row below the composer has neither, which is why this is not a chip there. To keep the strip from competing with the contextual cards in the same stack (todo, worktree creation, goal, queue), the line is chrome rather than a card: transparent and borderless while closed, so only the words are visible.
+The placement is deliberate. A branch name is occasionally long and a path is always long, so both need horizontal room; a full-width line gives that, while a chip in the centered statistics row below the composer competes with the activity and usage readings for the same few hundred pixels. To keep the strip from competing with the contextual cards in the same stack (todo, worktree creation, goal, queue), the line is chrome rather than a card: transparent and borderless, so only the words are visible.
+
+Because both facts are always shown, there is no disclosure control: the line never opens, never grows, and never moves the composer.
 
 ## What it reads
 
@@ -34,15 +36,16 @@ The Host half serves one authenticated `GET /__dsh-git-bar/state?sessionId=<id>`
 
 No subprocess runs, so the line is independent of the Git executable, the sandbox policy, and subprocess configuration. The route returns the branch, the detached commit, whether the `.git` entry is a pointer file, and the checkout root. Nothing is written to the session log, and no model input is added.
 
-The Client half reads that route when the line mounts, when the Session changes, when the window regains focus, when the tab becomes visible again, and every 20 seconds while the tab is visible. A failed read keeps the branch it already knew. The path line reads the built-in `workingDirectory` session projection first and falls back to the route's answer, so it follows a directory change immediately and works even when the route cannot be reached.
+The Client half reads that route when the line mounts, when the Session changes, when the window regains focus, when the tab becomes visible again, and every 20 seconds while the tab is visible. A failed read keeps the branch it already knew. The path reads the built-in `workingDirectory` session projection first and falls back to the route's answer, so it follows a directory change immediately and works even when the route cannot be reached.
 
 ## Requirements and limits
 
-- The Host composition needs `webServer`, `connection`, `sessionQuery`, and `workingDirectory`. Without them the Host half stays inactive and the line reads `Branch unavailable`, while the path line still works from the projection.
-- The branch is read over the page's own HTTP origin with the browser session cookie. A page loaded from `file://` cannot answer the route, so only the path line works there.
+- The Host composition needs `webServer`, `connection`, `sessionQuery`, and `workingDirectory`. Without them the Host half stays inactive and the line reads `Branch unavailable`, while the path still comes from the projection.
+- The branch is read over the page's own HTTP origin with the browser session cookie. A page loaded from `file://` cannot answer the route, so only the path shows there.
 - Branch and path describe the Session's working directory, not the repository that owns it. Inside a subdirectory of a checkout, the line shows the enclosing checkout's branch and the subdirectory's absolute path.
+- A window too narrow for the whole path ellipsizes it from the right; hover the path to read it in full. The branch yields up to 45% of the line before it ellipsizes in turn.
+- The line holds one 24px row above the composer for as long as a conversation is open.
 - The line re-reads on the schedule above; a branch switched in a terminal can take up to 20 seconds to appear, or appear at once when the window regains focus.
-- Closed, the line holds one 26px row above the composer for as long as a conversation is open. Opened, it adds the path row inside the same width and wraps a long path instead of scrolling it.
 
 ## Develop
 
