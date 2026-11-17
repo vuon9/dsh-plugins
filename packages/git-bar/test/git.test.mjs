@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
+import { homedir, tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { after, test } from 'node:test'
 import { ROUTE_PATH, apply, readGitState } from '../index.js'
@@ -192,8 +192,11 @@ test('the Host half registers one exact route that answers the session directory
   const response = await ask(routes[0])
   assert.equal(response.status, 200)
   assert.equal(response.headers.get('cache-control'), 'no-store')
-  assert.deepEqual(await response.json(), {
+  const body = await response.json()
+  assert.equal(body.home, homedir(), 'the answer carries the home directory the Client abbreviates with')
+  assert.deepEqual(body, {
     path: repo,
+    home: homedir(),
     branch: 'main',
     commit: null,
     detached: false,

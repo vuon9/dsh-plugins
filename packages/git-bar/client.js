@@ -12,6 +12,8 @@
  * branch keeps its own column and the path takes the rest, ellipsizing from the
  * right with the complete value on hover when the window is too narrow. Nothing
  * opens, nothing pushes the composer, and there is no control to discover.
+ * A directory under the home directory is shortened to `~`, and the absolute
+ * path stays the hover title.
  *
  * Nothing is read from the Host beyond the route's JSON and that projection.
  */
@@ -159,6 +161,21 @@ window.__ModuleLoader__.load({
     }
 
     /**
+     * Shorten a path that sits under the home directory.
+     * @param path - absolute directory to display.
+     * @param home - home directory reported by the Host, when it is known.
+     * @returns the path with its home prefix replaced by `~`; otherwise the path unchanged.
+     */
+    function tildeOf(path, home) {
+      if (typeof home !== 'string' || home === '') return path
+      const base = home.replace(/[\\/]+$/, '')
+      if (base === '') return path
+      if (path === base) return '~'
+      if (path.startsWith(base + '/') || path.startsWith(base + '\\')) return '~' + path.slice(base.length)
+      return path
+    }
+
+    /**
      * The line above the composer.
      * @param props - the dock's standard props and the locale seat.
      * @returns the branch and the working-directory path on one line.
@@ -220,6 +237,8 @@ window.__ModuleLoader__.load({
         ? projected
         : current !== null && typeof current.path === 'string' && current.path !== '' ? current.path : null
 
+      const shown = path === null ? null : tildeOf(path, current?.home)
+
       return h('div', { className: 'gb-bar', 'data-git-bar': '' }, [
         h('style', { key: 'css' }, CSS),
         h('div', { key: 'row', className: 'gb-row' }, [
@@ -231,9 +250,9 @@ window.__ModuleLoader__.load({
             title: known ? branch.text : undefined
           }, branch.text),
           h('span', { key: 'sep', className: 'gb-sep', 'aria-hidden': 'true' }, '·'),
-          path === null
+          shown === null
             ? h('span', { key: 'path', className: 'gb-path-missing' }, t('path.unavailable'))
-            : h('code', { key: 'path', className: 'gb-path', title: path }, path)
+            : h('code', { key: 'path', className: 'gb-path', title: path }, shown)
         ])
       ])
     }

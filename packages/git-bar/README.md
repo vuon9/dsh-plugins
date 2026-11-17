@@ -4,7 +4,7 @@ A slim line directly above the message composer in DeepSeek Harness. It shows, s
 
 Part of the [dsh-plugins](https://github.com/vuon9/dsh-plugins) collection.
 
-The line is one raised row: a branch mark, the branch name, a separator, then the path in monospace. It takes the composer card's own fill, hairline, and soft elevation, and matches its width and 12px inner padding, so it reads as the input area's top edge rather than as floating text. Being the composer's width, the usual branch and path fit together without truncation; when the window is narrower, the path ellipsizes from the right and its full value stays available as a hover title. A detached checkout reads `Detached at <commit>`, a directory outside a Git checkout reads `Not a Git checkout`, a checkout whose files cannot be read reads `Branch unreadable`, and a route that does not answer reads `Branch unavailable` — the path stays visible in every case.
+The line is one raised row: a branch mark, the branch name, a separator, then the path in monospace. A directory under your home directory is shortened to `~` (`~/work/acme-widgets`), and the absolute path stays the hover title. It takes the composer card's own fill, hairline, and soft elevation, and matches its width and 12px inner padding, so it reads as the input area's top edge rather than as floating text. Being the composer's width, the usual branch and path fit together without truncation; when the window is narrower, the path ellipsizes from the right and its full value stays available as a hover title. A detached checkout reads `Detached at <commit>`, a directory outside a Git checkout reads `Not a Git checkout`, a checkout whose files cannot be read reads `Branch unreadable`, and a route that does not answer reads `Branch unavailable` — the path stays visible in every case.
 
 ## Install
 
@@ -31,14 +31,14 @@ Because both facts are always shown, there is no disclosure control: the line ne
 
 ## What it reads
 
-The Host half serves one authenticated `GET /__dsh-git-bar/state?sessionId=<id>` route. For that Session it resolves the effective working directory through `sessionQuery` and `workingDirectory`, then reads the checkout's own administrative files:
+The Host half serves one authenticated `GET /__dsh-git-bar/state?sessionId=<id>` route. For that Session it resolves the effective working directory through `sessionQuery` and `workingDirectory`, returns the path unchanged along with the process's home directory, then reads the checkout's own administrative files:
 
 - `<checkout>/.git/HEAD` for a repository checkout;
 - for a linked worktree or a submodule, the `gitdir:` pointer in the checkout's `.git` file, then `HEAD` inside that Git directory.
 
 No subprocess runs, so the line is independent of the Git executable, the sandbox policy, and subprocess configuration. The route returns the branch, the detached commit, whether the `.git` entry is a pointer file, and the checkout root. Nothing is written to the session log, and no model input is added.
 
-The Client half reads that route when the line mounts, when the Session changes, when the window regains focus, when the tab becomes visible again, and every 20 seconds while the tab is visible. A failed read keeps the branch it already knew. The path reads the built-in `workingDirectory` session projection first and falls back to the route's answer, so it follows a directory change immediately and works even when the route cannot be reached.
+The Client half reads that route when the line mounts, when the Session changes, when the window regains focus, when the tab becomes visible again, and every 20 seconds while the tab is visible. A failed read keeps the branch it already knew. The path reads the built-in `workingDirectory` session projection first and falls back to the route's answer, so it follows a directory change immediately and works even when the route cannot be reached. Whichever directory it shows, the home prefix it learned from the route is replaced with `~`; a path outside home is left alone, and the absolute path is always kept as the element's hover title.
 
 ## Requirements and limits
 
@@ -54,10 +54,10 @@ The Client half reads that route when the line mounts, when the Session changes,
 No build step and no dependencies.
 
 ```bash
-node --test test/git.test.mjs
+node --test test/*.test.mjs
 ```
 
-The test builds throwaway checkouts, worktrees, and detached heads in the OS temp directory; it needs no Git install and touches no real repository.
+`test/git.test.mjs` builds throwaway checkouts, worktrees, and detached heads in the OS temp directory; it needs no Git install and touches no real repository. `test/client.test.mjs` renders the entry against a stand-in React and a stubbed route answer to cover the display rules: the `~` abbreviation, its Windows separator, a path outside home, the fresher projected directory, a missing home directory, and the no-path state.
 
 To try a checkout before sharing it, link it with **Plugins** > **Add plugin** and its absolute path, then delete the link with **Remove**.
 

@@ -26,7 +26,7 @@
     "dsh": ">=0.2.2-rc.3 <0.3.0"
   },
   "scripts": {
-    "test": "node --test test/git.test.mjs"
+    "test": "node --test test/*.test.mjs"
   },
   "exports": {
     ".": "./index.js",
