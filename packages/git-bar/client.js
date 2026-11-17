@@ -2,16 +2,18 @@
  * Git bar — Client half.
  *
  * Registers one slim, full-width line in the composer's input dock, directly
- * above the composer card. The line always names the branch of the directory
- * the Session works in; its Path button opens a second full-width line with
- * that directory's absolute path. The branch arrives from this bundle's Host
- * route, and the path reads the `workingDirectory` projection first, so it
- * follows a directory change immediately and works even when the route cannot
- * be reached.
+ * above the composer card. The line shows both facts at once, with nothing to
+ * click: the branch of the directory the Session works in, and that
+ * directory's absolute path. The branch arrives from this bundle's Host route,
+ * and the path reads the `workingDirectory` projection first, so it follows a
+ * directory change immediately and works even when the route cannot be reached.
  *
- * A full-width line rather than a chip in the readings row below the composer:
- * a branch name is occasionally long, and a centered row of statistics pills
- * has neither the width to show it nor a sensible place to grow a path line.
+ * Both values are long on occasion, so the line is full width and static: the
+ * branch keeps its own column and the path takes the rest, ellipsizing from the
+ * right with the complete value on hover when the window is too narrow. Nothing
+ * opens, nothing pushes the composer, and there is no control to discover.
+ * A directory under the home directory is shortened to `~`, and the absolute
+ * path stays the hover title.
  *
  * Nothing is read from the Host beyond the route's JSON and that projection.
  */
@@ -38,64 +40,39 @@ window.__ModuleLoader__.load({
     const DIRECTORY_PROJECTION = 'workingDirectory'
 
     const en = {
-      'branch.loading': '…',
+      'branch.loading': 'Reading branch…',
       'branch.notGit': 'Not a Git checkout',
       'branch.unreadable': 'Branch unreadable',
       'branch.unknownRef': 'No branch',
       'branch.unavailable': 'Branch unavailable',
       detached: 'Detached at {commit}',
-      'aria.branch': 'Git branch: {branch}',
-      'aria.detached': 'Detached Git revision: {commit}',
-      'aria.loading': 'Reading the Git branch',
-      'aria.none': 'The Git branch is unavailable',
-      'path.button': 'Path',
-      'toggle.show': 'Show the working directory path',
-      'toggle.hide': 'Hide the working directory path',
-      'path.label': 'Working directory path',
       'path.unavailable': 'Path unavailable'
     }
 
     const zh = {
-      'branch.loading': '…',
+      'branch.loading': '正在读取分支…',
       'branch.notGit': '不是 Git 工作区',
       'branch.unreadable': '无法读取分支',
       'branch.unknownRef': '没有分支',
       'branch.unavailable': '分支不可用',
       detached: '分离 HEAD：{commit}',
-      'aria.branch': 'Git 分支：{branch}',
-      'aria.detached': '分离 HEAD 的提交：{commit}',
-      'aria.loading': '正在读取 Git 分支',
-      'aria.none': 'Git 分支不可用',
-      'path.button': '路径',
-      'toggle.show': '显示工作目录的绝对路径',
-      'toggle.hide': '收起工作目录的绝对路径',
-      'path.label': '工作目录的绝对路径',
       'path.unavailable': '路径不可用'
     }
 
-    // Width and typing follow the other full-width strips in this dock (GoalBar's
-    // `.dock`/`.bar`), so the line's edges line up with the composer card. The
-    // line is chrome, not a card: transparent and borderless while closed, so it
-    // does not compete with the contextual cards in the same stack.
+    // The bar mirrors the composer card it sits above: the same side clearance
+    // and max width (so both edges line up at every window size), the same
+    // input fill, stroke color, and soft elevation tier, the same 12px inner
+    // pad as the card's content, and the dock family's radius.
     const CSS = `
-.gb-bar { box-sizing: border-box; width: calc(100% - var(--dsh-composer-side-clearance) - var(--dsh-composer-side-clearance) - var(--dsh-composer-dock-inset) - var(--dsh-composer-dock-inset) - var(--dsh-composer-dock-inset) - var(--dsh-composer-dock-inset)); margin: 0 auto; }
+.gb-bar { box-sizing: border-box; width: calc(100% - var(--dsh-composer-side-clearance) - var(--dsh-composer-side-clearance)); max-width: var(--dsh-composer-card-max-width); margin: 0 auto; }
 .gb-bar, .gb-bar * { box-sizing: border-box; }
-.gb-frame { width: 100%; max-width: calc(var(--dsh-composer-card-max-width) - var(--dsh-composer-dock-inset) - var(--dsh-composer-dock-inset) - var(--dsh-composer-dock-inset) - var(--dsh-composer-dock-inset)); margin: 0 auto; border-radius: var(--dsw-radius-md, 10px); }
-.gb-frame[data-expanded="true"] { padding-bottom: 7px; background: var(--dsw-alias-bg-layer-1); }
-.gb-row { display: flex; align-items: center; gap: 8px; min-height: 26px; padding: 0 6px; }
+.gb-row { display: flex; align-items: center; gap: 7px; min-height: 28px; padding: 0 12px; border-radius: var(--dsw-radius-md, 12px); background: var(--dsw-specific-input-major, var(--dsw-alias-bg-layer-1)); --dsw-elevation-stroke-color: var(--dsw-alias-border-l2); box-shadow: var(--dsw-elevation-soft, 0 0 0 0.5px var(--dsw-alias-border-l1)); font-size: calc(var(--dsh-content-font-size-secondary, 13px) - 1px); line-height: 18px; }
 .gb-glyph { display: inline-flex; flex: none; color: var(--dsw-alias-label-secondary); }
-.gb-branch { flex: 0 1 auto; min-width: 0; overflow: hidden; color: var(--dsw-alias-label-primary); font-size: calc(var(--dsh-content-font-size-secondary, 13px) - 1px); font-weight: 500; line-height: 18px; text-overflow: ellipsis; white-space: nowrap; }
+.gb-branch { flex: 0 1 auto; min-width: 0; max-width: 45%; overflow: hidden; color: var(--dsw-alias-label-primary); font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
 .gb-branch[data-known="false"] { color: var(--dsw-alias-label-secondary); font-weight: 400; }
-.gb-toggle { display: inline-flex; flex: none; align-items: center; gap: 2px; height: 22px; padding: 0 6px; border: 0; border-radius: var(--dsw-radius-sm, 6px); background: transparent; color: var(--dsw-alias-label-secondary); font: inherit; font-size: calc(var(--dsh-content-font-size-secondary, 13px) - 1px); cursor: pointer; }
-@media (hover: hover) { .gb-toggle:hover { background: var(--dsw-alias-bg-overlay); color: var(--dsw-alias-label-primary); } }
-.gb-toggle:focus-visible { outline: 2px solid var(--dsw-alias-brand-primary); outline-offset: -2px; }
-.gb-toggle svg { display: block; transition: transform 140ms ease; }
-.gb-frame[data-expanded="true"] .gb-toggle svg { transform: rotate(180deg); }
-.gb-path { display: block; padding: 0 6px; }
-.gb-path[hidden] { display: none; }
-.gb-path-text { display: block; color: var(--dsw-alias-label-secondary); font-family: var(--ds-font-family-code, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace); font-size: calc(var(--dsh-content-font-size-secondary, 13px) - 1px); line-height: 18px; overflow-wrap: anywhere; text-align: left; user-select: text; }
-.gb-path-missing { display: block; color: var(--dsw-alias-label-secondary); font-size: calc(var(--dsh-content-font-size-secondary, 13px) - 1px); line-height: 18px; text-align: left; }
-@media (prefers-reduced-motion: reduce) { .gb-toggle svg { transition: none; } }
+.gb-sep { flex: none; color: var(--dsw-alias-label-secondary); }
+.gb-path { flex: 1 1 0; min-width: 0; overflow: hidden; color: var(--dsw-alias-label-secondary); font-family: var(--ds-font-family-code, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace); text-overflow: ellipsis; white-space: nowrap; user-select: text; }
+.gb-path-missing { flex: none; color: var(--dsw-alias-label-secondary); white-space: nowrap; }
 `
 
     /** The branch mark at the left of the line; inherits the line's ink. */
@@ -127,24 +104,6 @@ window.__ModuleLoader__.load({
           strokeLinecap: 'round'
         })
       ])
-    }
-
-    /** The disclosure mark; points down while the path line is hidden. */
-    function ChevronGlyph() {
-      return h('svg', {
-        width: 12,
-        height: 12,
-        viewBox: '0 0 16 16',
-        fill: 'none',
-        'aria-hidden': 'true',
-        focusable: 'false'
-      }, h('path', {
-        d: 'M4.5 6.25 8 9.75l3.5-3.5',
-        stroke: 'currentColor',
-        strokeWidth: 1.6,
-        strokeLinecap: 'round',
-        strokeLinejoin: 'round'
-      }))
     }
 
     /**
@@ -182,10 +141,10 @@ window.__ModuleLoader__.load({
     }
 
     /**
-     * Describe the branch line for the current answer.
+     * Describe the branch reading for the current answer.
      * @param answer - the route's answer for this Session, or null before the first one.
      * @param t - the locale translate function.
-     * @returns the line's text, what it describes, and whether it names a revision.
+     * @returns the reading's text, what it describes, and whether it names a revision.
      */
     function branchOf(answer, t) {
       if (answer === null) return { text: t('branch.loading'), kind: 'loading' }
@@ -202,25 +161,24 @@ window.__ModuleLoader__.load({
     }
 
     /**
-     * Describe the line for assistive technology.
-     * @param branch - the branch line from {@link branchOf}.
-     * @param commit - the short detached commit, when the line names one.
-     * @param t - the locale translate function.
-     * @returns the group's accessible name.
+     * Shorten a path that sits under the home directory.
+     * @param path - absolute directory to display.
+     * @param home - home directory reported by the Host, when it is known.
+     * @returns the path with its home prefix replaced by `~`; otherwise the path unchanged.
      */
-    function accessibleName(branch, commit, t) {
-      switch (branch.kind) {
-        case 'branch': return t('aria.branch', { branch: branch.text })
-        case 'detached': return t('aria.detached', { commit: commit ?? branch.text })
-        case 'loading': return t('aria.loading')
-        default: return t('aria.none')
-      }
+    function tildeOf(path, home) {
+      if (typeof home !== 'string' || home === '') return path
+      const base = home.replace(/[\\/]+$/, '')
+      if (base === '') return path
+      if (path === base) return '~'
+      if (path.startsWith(base + '/') || path.startsWith(base + '\\')) return '~' + path.slice(base.length)
+      return path
     }
 
     /**
      * The line above the composer.
-     * @param props - the dock's standard props, the locale seat, and the owner values.
-     * @returns the branch reading and, once opened, the working-directory path line.
+     * @param props - the dock's standard props and the locale seat.
+     * @returns the branch and the working-directory path on one line.
      */
     function GitBar(props) {
       const t = typeof props.t === 'function' ? props.t : key => key
@@ -228,8 +186,6 @@ window.__ModuleLoader__.load({
       const projected = typeof props.useProjection === 'function'
         ? props.useProjection(DIRECTORY_PROJECTION)
         : undefined
-      const pathId = React.useId()
-      const [expanded, setExpanded] = React.useState(false)
       const [answer, setAnswer] = React.useState(null)
 
       React.useEffect(() => {
@@ -280,49 +236,23 @@ window.__ModuleLoader__.load({
       const path = typeof projected === 'string' && projected !== ''
         ? projected
         : current !== null && typeof current.path === 'string' && current.path !== '' ? current.path : null
-      const toggleLabel = t(expanded ? 'toggle.hide' : 'toggle.show')
+
+      const shown = path === null ? null : tildeOf(path, current?.home)
 
       return h('div', { className: 'gb-bar', 'data-git-bar': '' }, [
         h('style', { key: 'css' }, CSS),
-        h('div', {
-          key: 'frame',
-          className: 'gb-frame',
-          'data-expanded': expanded ? 'true' : 'false',
-          role: 'group',
-          'aria-label': accessibleName(branch, current?.commit, t)
-        }, [
-          h('div', { key: 'row', className: 'gb-row' }, [
-            h('span', { key: 'glyph', className: 'gb-glyph' }, h(BranchGlyph)),
-            h('span', {
-              key: 'branch',
-              className: 'gb-branch',
-              'data-known': known ? 'true' : 'false',
-              title: known ? branch.text : undefined
-            }, branch.text),
-            h('button', {
-              key: 'toggle',
-              type: 'button',
-              className: 'gb-toggle',
-              'aria-expanded': expanded,
-              'aria-controls': pathId,
-              'aria-label': toggleLabel,
-              title: toggleLabel,
-              onClick: () => { setExpanded(next => !next) }
-            }, [
-              h('span', { key: 'label' }, t('path.button')),
-              h(ChevronGlyph)
-            ])
-          ]),
-          h('div', {
-            key: 'path',
-            id: pathId,
-            className: 'gb-path',
-            role: 'group',
-            'aria-label': t('path.label'),
-            hidden: !expanded
-          }, path === null
-            ? h('span', { className: 'gb-path-missing' }, t('path.unavailable'))
-            : h('code', { className: 'gb-path-text' }, path))
+        h('div', { key: 'row', className: 'gb-row' }, [
+          h('span', { key: 'glyph', className: 'gb-glyph', 'aria-hidden': 'true' }, h(BranchGlyph)),
+          h('span', {
+            key: 'branch',
+            className: 'gb-branch',
+            'data-known': known ? 'true' : 'false',
+            title: known ? branch.text : undefined
+          }, branch.text),
+          h('span', { key: 'sep', className: 'gb-sep', 'aria-hidden': 'true' }, '·'),
+          shown === null
+            ? h('span', { key: 'path', className: 'gb-path-missing' }, t('path.unavailable'))
+            : h('code', { key: 'path', className: 'gb-path', title: path }, shown)
         ])
       ])
     }

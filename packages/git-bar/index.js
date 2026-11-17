@@ -3,7 +3,8 @@
  *
  * Serves one read-only, authenticated GET route that answers the Git state of
  * the Session's working directory: the checked-out branch, the detached commit,
- * and the checkout's absolute directory. The Client half draws the strip above
+ * the checkout's absolute directory, and the home directory the Client needs to
+ * shorten a path under it to `~`. The Client half draws the strip above
  * the composer and reads that route; this half adds no model input and writes
  * no session event.
  *
@@ -15,6 +16,7 @@
  */
 
 import { readFile, stat } from 'node:fs/promises'
+import { homedir } from 'node:os'
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 
 /** Exact pathname of the state route the Client half reads. */
@@ -174,7 +176,9 @@ async function answer(scope, request) {
     return json({ error: 'unknown-session' }, 404)
   }
 
-  return json({ path: directory, ...await readGitState(directory) })
+  // The home directory travels with the answer so the Client can abbreviate
+  // whichever directory it ends up showing; the path itself stays absolute.
+  return json({ path: directory, home: homedir(), ...await readGitState(directory) })
 }
 
 /**
