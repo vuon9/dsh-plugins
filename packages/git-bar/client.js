@@ -57,14 +57,14 @@ window.__ModuleLoader__.load({
       'path.unavailable': '路径不可用'
     }
 
-    // Width and typing follow the other full-width strips in this dock (GoalBar's
-    // `.dock`/`.bar`), so the line's edges line up with the composer card. It is
-    // chrome, not a card: transparent and borderless, so it does not compete with
-    // the contextual cards in the same stack.
+    // The bar mirrors the composer card it sits above: the same side clearance
+    // and max width (so both edges line up at every window size), the same
+    // input fill, stroke color, and soft elevation tier, the same 12px inner
+    // pad as the card's content, and the dock family's radius.
     const CSS = `
-.gb-bar { box-sizing: border-box; width: calc(100% - var(--dsh-composer-side-clearance) - var(--dsh-composer-side-clearance) - var(--dsh-composer-dock-inset) - var(--dsh-composer-dock-inset) - var(--dsh-composer-dock-inset) - var(--dsh-composer-dock-inset)); margin: 0 auto; }
+.gb-bar { box-sizing: border-box; width: calc(100% - var(--dsh-composer-side-clearance) - var(--dsh-composer-side-clearance)); max-width: var(--dsh-composer-card-max-width); margin: 0 auto; }
 .gb-bar, .gb-bar * { box-sizing: border-box; }
-.gb-row { display: flex; align-items: center; gap: 7px; min-height: 24px; padding: 0 6px; border-radius: var(--dsw-radius-sm, 6px); font-size: calc(var(--dsh-content-font-size-secondary, 13px) - 1px); line-height: 18px; }
+.gb-row { display: flex; align-items: center; gap: 7px; min-height: 28px; padding: 0 12px; border-radius: var(--dsw-radius-md, 12px); background: var(--dsw-specific-input-major, var(--dsw-alias-bg-layer-1)); --dsw-elevation-stroke-color: var(--dsw-alias-border-l2); box-shadow: var(--dsw-elevation-soft, 0 0 0 0.5px var(--dsw-alias-border-l1)); font-size: calc(var(--dsh-content-font-size-secondary, 13px) - 1px); line-height: 18px; }
 .gb-glyph { display: inline-flex; flex: none; color: var(--dsw-alias-label-secondary); }
 .gb-branch { flex: 0 1 auto; min-width: 0; max-width: 45%; overflow: hidden; color: var(--dsw-alias-label-primary); font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
 .gb-branch[data-known="false"] { color: var(--dsw-alias-label-secondary); font-weight: 400; }
